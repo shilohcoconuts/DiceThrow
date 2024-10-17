@@ -12,6 +12,15 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        val fragment = DieFragment.newInstance(20)
+
+        supportFragmentManager
+            .beginTransaction()
+            .add(R.id.dieContainer,fragment)
+            .commit()
+
+
+
         findViewById<Button>(R.id.rollDiceButton).setOnClickListener {
             (supportFragmentManager.findFragmentById(R.id.dieContainer) as DieFragment).throwDie()
         }
