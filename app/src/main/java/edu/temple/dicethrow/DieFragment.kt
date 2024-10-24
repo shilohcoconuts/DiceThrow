@@ -6,12 +6,17 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.lifecycle.ViewModelProvider
 import kotlin.random.Random
 
 
 const val DIESIDE = "sidenumber"
 
 class DieFragment : Fragment() {
+
+    val dieViewModel: DieViewModel by lazy {
+        ViewModelProvider(requireActivity())[DieViewModel::class.java]
+    }
 
     lateinit var dieTextView: TextView
 
@@ -21,6 +26,9 @@ class DieFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+
+
         arguments?.let {
             it.getInt(DIESIDE).run {
                 dieSides = this
@@ -40,25 +48,22 @@ class DieFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        savedInstanceState?.run{
-            rollValue = getInt(KEY)
+
+        dieViewModel.getDieRoll().observe(viewLifecycleOwner){
+            dieTextView.text = it.toString()
         }
-        if(rollValue!=0){
-            dieTextView.text = rollValue.toString()
-        }else
-        throwDie()
+
+
+        if( dieViewModel.getDieRoll().value == null){
+            throwDie()
+        }
     }
 
     fun throwDie() {
-        var roll = Random.nextInt(dieSides)+1
-        dieTextView.text = roll.toString()
-        rollValue = roll
+        dieViewModel.setDieRoll(Random.nextInt(dieSides)+1)
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        outState.putInt(KEY,rollValue)
-    }
+
 
     companion object{
         fun newInstance(sides: Int) = DieFragment().apply{
